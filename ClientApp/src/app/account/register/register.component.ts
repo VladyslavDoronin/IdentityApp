@@ -4,7 +4,7 @@ import { AccountService } from '../account.service';
 import { SharedService } from 'src/app/shared/shared.service';
 import { Route, Router } from '@angular/router';
 import { take } from 'rxjs';
-import { User } from 'src/app/shared/models/user';
+import { User } from 'src/app/shared/models/account/user';
 
 @Component({
   selector: 'app-register',
@@ -36,7 +36,7 @@ export class RegisterComponent implements OnInit{
     this.registerForm = this.formBuilder.group({
       firstName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(45)]],
       lastName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(45)]],
-      email: ['', [Validators.required, Validators.pattern('^\\w+@[a-zA-Z_]+?\\.[a-zA-Z]{2,3}$')]],
+      email: ['', [Validators.required, Validators.pattern('^.+@[^\\.].*\\.[a-z]{2,}$')]],
       password: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(45)]],
     })
   }
