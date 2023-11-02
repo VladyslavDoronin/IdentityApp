@@ -106,7 +106,7 @@ builder.Services.AddAuthorization(opt =>
     opt.AddPolicy("AdminAndManagerPolicy", policy => policy.RequireRole("Admin").RequireRole("Manager"));
     opt.AddPolicy("AllRolePolicy", policy => policy.RequireRole("Admin", "Manager", "User"));
 
-    opt.AddPolicy("AdminEmailPolicy", policy => policy.RequireClaim(ClaimTypes.Email, "admin@example.com"));
+    opt.AddPolicy("AdminEmailPolicy", policy => policy.RequireClaim(ClaimTypes.Email, SD.AdminUserName));
     opt.AddPolicy("MillerSurnamePolicy", policy => policy.RequireClaim(ClaimTypes.Surname, "miller"));
     opt.AddPolicy("ManagerEmailAndWilsonSurnamePolicy", policy => policy.RequireClaim(ClaimTypes.Surname, "wilson")
     .RequireClaim(ClaimTypes.Email, "manager@example.com"));

@@ -13,6 +13,10 @@ namespace Api
         public const string ManagerRole = "Manager";
         public const string UserRole = "User";
 
+        public const string AdminUserName = "admin@example.com";
+        public const string SuperAdminChangeNotAllow = "Supper Admin change is not allowed";
+        public const int MaximumLoginAttempts = 3;
+
         public static bool VIPPolicy(AuthorizationHandlerContext context)
         {
             if(context.User.IsInRole(UserRole) && 

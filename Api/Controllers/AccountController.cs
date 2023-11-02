@@ -64,7 +64,31 @@ namespace Api.Controllers
             if(!user.EmailConfirmed) return Unauthorized("Please confirm your email.");
 
             var result = await _signInManager.CheckPasswordSignInAsync(user, model.Password, false);
-            if(!result.Succeeded) return Unauthorized("Invalid username or password");
+            if (result.IsLockedOut)
+            {
+                return Unauthorized(string.Format("Your account has been locked. You should wait until {0} (UTC time) to be able to login", user.LockoutEnd));
+            }
+            if (!result.Succeeded)
+            {
+                //user has input an invalid password
+                if (!user.UserName.Equals(SD.AdminUserName))
+                {
+                    //incrementing accessFailedCount of the AspNetUser by 1
+                    await _userManager.AccessFailedAsync(user);
+                }
+
+                if(user.AccessFailedCount >= SD.MaximumLoginAttempts)
+                {
+                    //Lock the user for one day
+                    await _userManager.SetLockoutEndDateAsync(user, DateTime.UtcNow.AddDays(1));
+                    return Unauthorized(string.Format("Your account has been locked. You should wait until {0} (UTC time) to be able to login", user.LockoutEnd));
+                }
+
+                return Unauthorized("Invalid username or password");
+            }
+
+            await _userManager.ResetAccessFailedCountAsync(user);
+            await _userManager.SetLockoutEndDateAsync(user, null);
 
             return await CreateApplicationUserDto(user);
         }
@@ -113,7 +137,7 @@ namespace Api.Controllers
                 return BadRequest($"An existing account is usong {model.Email}, email address. Please try another email address");
             }
 
-            var userToadd = new User
+            var userToAdd = new User
             {
                 FirstName = model.FirstName.ToLower(),
                 LastName = model.LastName.ToLower(),
@@ -121,12 +145,13 @@ namespace Api.Controllers
                 Email = model.Email.ToLower()
             };
 
-            var result = await _userManager.CreateAsync(userToadd, model.Password);
+            var result = await _userManager.CreateAsync(userToAdd, model.Password);
             if (!result.Succeeded) return BadRequest(result.Errors);
+            await _userManager.AddToRoleAsync(userToAdd, SD.UserRole);
 
             try
             {
-                if(await SendConfirmEmailAsync(userToadd))
+                if(await SendConfirmEmailAsync(userToAdd))
                 {
                     return Ok(new JsonResult(new { title = "Account Created", message = "Your account has been created, please confirm your email address" }));
                 }
@@ -187,6 +212,7 @@ namespace Api.Controllers
 
             var result = await _userManager.CreateAsync(userToAdd);
             if (!result.Succeeded) return BadRequest(result.Errors);
+            await _userManager.AddToRoleAsync(userToAdd, SD.UserRole);
 
             return await CreateApplicationUserDto(userToAdd);
         }
