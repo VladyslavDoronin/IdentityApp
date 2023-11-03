@@ -105,7 +105,7 @@ namespace Api.Controllers
             {
                 try
                 {
-                    if (!FacebookValidatedAsync(model.AccessToken, model.UserId).GetAwaiter().GetResult())
+                    if (!await FacebookValidatedAsync(model.AccessToken, model.UserId))
                     {
                         return Unauthorized("Unable to login with facebook");
                     }
@@ -117,7 +117,7 @@ namespace Api.Controllers
             }
             else if (model.Provider.Equals(SD.Google))
             {
-                if (!GoogleValidatedAsync(model.AccessToken, model.UserId).GetAwaiter().GetResult())
+                if (!await  GoogleValidatedAsync(model.AccessToken, model.UserId))
                 {
                     return Unauthorized("Unable to login with google");
                 }
@@ -175,7 +175,7 @@ namespace Api.Controllers
             {
                 try
                 {
-                    if(!FacebookValidatedAsync(model.AccessToken, model.UserId).GetAwaiter().GetResult())
+                    if(!await FacebookValidatedAsync(model.AccessToken, model.UserId))
                     {
                         return Unauthorized("Unable to register with facebook");
                     }
@@ -189,7 +189,7 @@ namespace Api.Controllers
             {
                 try
                 {
-                    if (!GoogleValidatedAsync(model.AccessToken, model.UserId).GetAwaiter().GetResult())
+                    if (!await GoogleValidatedAsync(model.AccessToken, model.UserId))
                     {
                         return Unauthorized("Unable to register with google");
                     }

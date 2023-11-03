@@ -25,7 +25,7 @@ namespace Api.Services
 
         public async Task InitializeContextAsync()
         {
-            if(_context.Database.GetPendingMigrationsAsync().GetAwaiter().GetResult().Count()>0) 
+            if((await _context.Database.GetPendingMigrationsAsync()).Count()>0) 
             {
                 //applies any pending migration into our database
                 await _context.Database.MigrateAsync();
@@ -38,7 +38,7 @@ namespace Api.Services
                 await _roleManager.CreateAsync(new IdentityRole { Name = SD.UserRole });
             }
 
-            if (!_userManager.Users.AnyAsync().GetAwaiter().GetResult())
+            if (!await _userManager.Users.AnyAsync())
             {
                 #region admin
                 var admin = new User
