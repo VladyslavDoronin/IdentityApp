@@ -1,8 +1,10 @@
-﻿using Api.DTOs.Account;
+﻿using Api.Data;
+using Api.DTOs.Account;
 using Api.Models;
 using Api.Services;
 using Google.Apis.Auth;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -27,6 +29,7 @@ namespace Api.Controllers
         private readonly SignInManager<User> _signInManager;
         private readonly UserManager<User> _userManager;
         private readonly EmailService _emailService;
+        private readonly Context _context;
         private readonly IConfiguration _config;
         private readonly HttpClient _facebookHttpClient;
 
@@ -34,12 +37,14 @@ namespace Api.Controllers
             SignInManager<User> signInManager,
             UserManager<User> userManager,
             EmailService emailService,
+            Context context,
             IConfiguration config)
         {
             _jWTService = jWTService;
             _signInManager = signInManager;
             _userManager = userManager;
             _emailService = emailService;
+            _context = context;
             _config = config;
             _facebookHttpClient = new HttpClient
             {
@@ -48,9 +53,27 @@ namespace Api.Controllers
         }
 
         [Authorize]
-        [HttpGet("refresh-user-token")]
-        public async Task<ActionResult<UserDto>> RefreshUserToken()
+        [HttpPost("refresh-token")]
+        public async Task<ActionResult<UserDto>> RefreshToken()
         {
+            var token = Request.Cookies["identityAppRefreshToken"];
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (await IsValidRefreshTokenAsync(userId, token))
+            {
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user == null) return Unauthorized("Invalid or expired token, please try to login");
+                return await CreateApplicationUserDto(user);
+            }
+
+            return Unauthorized("Invalid or expired token, please try to login");
+        }
+
+        [Authorize]
+        [HttpGet("refresh-page")]
+        public async Task<ActionResult<UserDto>> RefreshPage()
+        {
+            var token = Request.Cookies["identityAppRefreshToken"];
             var user = await _userManager.FindByNameAsync(User.FindFirst(ClaimTypes.Email)?.Value);
 
             if(await _userManager.IsLockedOutAsync(user))
@@ -325,6 +348,7 @@ namespace Api.Controllers
         #region Private Helper Methods
         private async Task<UserDto> CreateApplicationUserDto(User user)
         {
+            await SaveRefreshTokenAsync(user);
             return new UserDto
             {
                 FirstName = user.FirstName,
@@ -417,6 +441,48 @@ namespace Api.Controllers
             }
 
             return true;
+        }
+
+        private async Task SaveRefreshTokenAsync(User user)
+        {
+            var refreshToken = _jWTService.CreateRefreshToken(user);
+
+            var existingRefershToken = await _context.RefreshTokens.SingleOrDefaultAsync(x=>x.UserId== user.Id);
+            if(existingRefershToken != null)
+            {
+                existingRefershToken.Token = refreshToken.Token;
+                existingRefershToken.DateCreated = refreshToken.DateCreated;
+                existingRefershToken.DateExpiresUtc = refreshToken.DateExpiresUtc;
+            }
+            else
+            {
+                user.RefreshTokens.Add(refreshToken);
+            }
+
+            await _context.SaveChangesAsync();
+
+            var cookieOptions = new CookieOptions
+            {
+                Expires = refreshToken.DateExpiresUtc,
+                IsEssential = true,
+                HttpOnly = true,
+                Secure = true
+            };
+
+            Response.Cookies.Append("identityAppRefreshToken", refreshToken.Token, cookieOptions);
+        }
+
+        public async Task<bool> IsValidRefreshTokenAsync(string userId, string token)
+        {
+            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(token)) return false;
+
+            var fetchedRefreshToken = await _context.RefreshTokens
+                .FirstOrDefaultAsync(x=>x.UserId == userId && x.Token == token);
+            if (fetchedRefreshToken == null) return false;
+            if (fetchedRefreshToken.IsExpired) return false;
+
+            return true;
+
         }
         #endregion
     }

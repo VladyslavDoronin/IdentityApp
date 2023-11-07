@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { AccountService } from './account/account.service';
 import { SharedService } from './shared/shared.service';
+import { User } from './shared/models/account/user';
+import { take } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -10,26 +12,39 @@ import { SharedService } from './shared/shared.service';
 export class AppComponent implements OnInit {
 
   constructor(private accountService: AccountService,
-    private sharedService: SharedService){}
+    private sharedService: SharedService) { }
 
   ngOnInit(): void {
     this.refreshUser();
   }
 
-  private refreshUser(){
+  @HostListener('window:keydown')
+  @HostListener('window:mousedown')
+  checkUserActivity() {
+    this.accountService.user$.pipe(take(1)).subscribe({
+      next: (user: User | null) => {
+        if (user) {
+          clearTimeout(this.accountService.timeoutId);
+          this.accountService.checkUserIdleTimout();
+        }
+      }
+    })
+  }
+
+  private refreshUser() {
     const jwt = this.accountService.getJWT();
-    if(jwt){
+    if (jwt) {
       this.accountService.refreshUser(jwt).subscribe({
-        next: _ => {},
+        next: _ => { },
         error: error => {
           this.accountService.logout();
-          if(error.status === 401){
+          if (error.status === 401) {
             this.sharedService.showNotification(false, 'Account blocked', error.error);
           }
         }
       })
     }
-    else{
+    else {
       this.accountService.refreshUser(null).subscribe();
     }
   }

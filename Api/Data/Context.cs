@@ -10,5 +10,7 @@ namespace Api.Data
         public Context(DbContextOptions<Context> options):base(options)
         { 
         }
+
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
     }
 }
