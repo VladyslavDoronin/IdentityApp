@@ -10,11 +10,11 @@ namespace Api.Services
 {
     public class ContextSeedService
     {
-        private readonly Context _context;
+        private readonly DataContext _context;
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
 
-        public ContextSeedService(Context context,
+        public ContextSeedService(DataContext context,
             UserManager<User> userManager,
             RoleManager<IdentityRole> roleManager)
         {

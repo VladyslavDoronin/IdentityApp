@@ -1,0 +1,25 @@
+<!-- Import Leaflet CSS -->
+
+<div id="map"></div>
+
+
+<!-- Add a loading spinner or message while data is being fetched -->
+<div *ngIf="loading">Loading data...</div>
+
+<!-- Display the map and other components once data is loaded -->
+<div *ngIf="!loading">
+  <!-- Your Leaflet map initialization code here -->
+</div>
+
+<!-- Rest of the HTML content from the original code -->
+
+<!-- Create Legend -->
+<div id="legend" class="legend bottomright">
+  <!-- Legend content will be dynamically added using Angular binding -->
+</div>
+
+<!-- Bar Chart Legend -->
+<!-- <div id="info" class="info topright">
+  <h5>Top 10 Consumers (KL)</h5>
+  <canvas id="horBarChart"></canvas>
+</div> -->

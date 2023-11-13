@@ -29,7 +29,7 @@ namespace Api.Controllers
         private readonly SignInManager<User> _signInManager;
         private readonly UserManager<User> _userManager;
         private readonly EmailService _emailService;
-        private readonly Context _context;
+        private readonly DataContext _context;
         private readonly IConfiguration _config;
         private readonly HttpClient _facebookHttpClient;
 
@@ -37,7 +37,7 @@ namespace Api.Controllers
             SignInManager<User> signInManager,
             UserManager<User> userManager,
             EmailService emailService,
-            Context context,
+            DataContext context,
             IConfiguration config)
         {
             _jWTService = jWTService;

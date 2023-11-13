@@ -1,6 +1,7 @@
 using Api;
 using Api.Data;
 using Api.Models;
+using Api.Repositories;
 using Api.Services;
 using Google.Apis.Logging;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -28,15 +29,23 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContext<Context>(options =>
-{
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectionSql"));
-});
+//builder.Services.AddDbContext<Context>(options =>
+//{
+//    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectionSql"));
+//});
+builder.Services.AddDbContext<DataContext>(options => options.UseNpgsql(
+    builder.Configuration.GetConnectionString("DefaultConnectionSql")
+    ));
+
+builder.Services.AddScoped<IDataContext>(provider => provider.GetService<DataContext>());
 
 //to be able to inject JWTService class inside our Controllers
 builder.Services.AddScoped<JWTService>();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<ContextSeedService>();
+builder.Services.AddScoped<IWaterConsumptionRepository, WaterConsumptionRepository>();
+
+builder.Services.AddControllersWithViews();
 
 //defining our IdentifyCore Service
 builder.Services.AddIdentityCore<User>(options =>
@@ -53,7 +62,7 @@ builder.Services.AddIdentityCore<User>(options =>
 })
     .AddRoles<IdentityRole>() // be able to add roles
     .AddRoleManager<RoleManager<IdentityRole>>()// be able to make use of RoleManager
-    .AddEntityFrameworkStores<Context>() // providing our context
+    .AddEntityFrameworkStores<DataContext>() // providing our context
     .AddSignInManager<SignInManager<User>>() // make use of Singin manager
     .AddUserManager<UserManager<User>>() //make use of UserManager to create users
     .AddDefaultTokenProviders(); // be able to create tokens for email confirmation
@@ -123,7 +132,6 @@ builder.Services.Configure<CookiePolicyOptions>(options =>
     options.CheckConsentNeeded = context => true;
     options.MinimumSameSitePolicy = SameSiteMode.None;
 });
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -139,6 +147,10 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+}
+else
+{
+    app.UseHsts();
 }
 
 app.UseHttpsRedirection();

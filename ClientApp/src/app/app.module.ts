@@ -11,6 +11,7 @@ import { SharedModule } from './shared/shared.module';
 import { PlayComponent } from './play/play.component';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { JwtInterceptor } from './shared/interceptors/jwt.interceptor';
+import { MapComponent } from './map/map.component';
 
 @NgModule({
   declarations: [
@@ -18,7 +19,8 @@ import { JwtInterceptor } from './shared/interceptors/jwt.interceptor';
     NavbarComponent,
     FooterComponent,
     HomeComponent,
-    PlayComponent
+    PlayComponent,
+    MapComponent
   ],
   imports: [
     BrowserModule,
