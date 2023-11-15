@@ -22,6 +22,25 @@ namespace Api.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Api.Models.KievTmp", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Color")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Coordinates")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("KievPoints");
+                });
+
             modelBuilder.Entity("Api.Models.RefreshToken", b =>
                 {
                     b.Property<Guid>("Id")

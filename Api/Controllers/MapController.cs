@@ -1,5 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Api.Models;
+using Api.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Api.Controllers
 {
@@ -8,10 +12,18 @@ namespace Api.Controllers
     [ApiController]
     public class MapController : ControllerBase
     {
-        [HttpGet("get-map")]
-        public IActionResult Map()
+        private readonly IKievTmpRepository _kievTmpRepository;
+        
+        public MapController(IKievTmpRepository kievTmpRepository)
         {
-            return Ok(new JsonResult(new { message = "Only authorize users can view map" }));
+            this._kievTmpRepository = kievTmpRepository;
+        }
+
+        [HttpGet("get-map")]
+        public async Task<ActionResult<IEnumerable<KievTmp>>> Map()
+        {
+            var data = await this._kievTmpRepository.GetAll();
+            return Ok(data);
         }
     }
 }

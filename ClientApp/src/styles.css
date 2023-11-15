@@ -1,1 +1,15 @@
 /* You can add global styles to this file, and also import other style files */
+.popupTextColorred {
+    color: red;
+    font-size: 14px;
+  }
+
+  .popupTextColorgreen {
+    color: green;
+    font-size: 14px;
+  }
+
+  .popupTextColoryellow {
+    color: #ffb700;
+    font-size: 14px;
+  }

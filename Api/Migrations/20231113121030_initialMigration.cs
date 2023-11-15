@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Api.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class initialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -53,6 +53,35 @@ namespace Api.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Consumptions",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Neighbourhood = table.Column<string>(type: "text", nullable: true),
+                    Suburb_group = table.Column<string>(type: "text", nullable: true),
+                    averageMonthlyKL = table.Column<int>(type: "integer", nullable: false),
+                    Coordinates = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Consumptions", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "KievPoints",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Coordinates = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_KievPoints", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -242,6 +271,12 @@ namespace Api.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
+                name: "Consumptions");
+
+            migrationBuilder.DropTable(
+                name: "KievPoints");
 
             migrationBuilder.DropTable(
                 name: "RefreshTokens");

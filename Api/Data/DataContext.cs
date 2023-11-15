@@ -11,5 +11,6 @@ namespace Api.Data
         }
         public DbSet<WaterConsumption> Consumptions { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<KievTmp> KievPoints { get; set; }
     }
 }

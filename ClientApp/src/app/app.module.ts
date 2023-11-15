@@ -12,6 +12,7 @@ import { PlayComponent } from './play/play.component';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { JwtInterceptor } from './shared/interceptors/jwt.interceptor';
 import { MapComponent } from './map/map.component';
+import { PopupService } from './shared/popups/popup.service';
 
 @NgModule({
   declarations: [
@@ -29,7 +30,8 @@ import { MapComponent } from './map/map.component';
     BrowserAnimationsModule
   ],
   providers: [
-    {provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi:true}
+    {provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi:true},
+    PopupService
   ],
   bootstrap: [AppComponent]
 })

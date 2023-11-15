@@ -29,7 +29,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-//builder.Services.AddDbContext<Context>(options =>
+//builder.Services.AddDbContext<DataContext>(options =>
 //{
 //    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectionSql"));
 //});
@@ -44,6 +44,7 @@ builder.Services.AddScoped<JWTService>();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<ContextSeedService>();
 builder.Services.AddScoped<IWaterConsumptionRepository, WaterConsumptionRepository>();
+builder.Services.AddScoped<IKievTmpRepository, KievTmpRepository>();
 
 builder.Services.AddControllersWithViews();
 
